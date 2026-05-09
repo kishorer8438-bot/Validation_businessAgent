@@ -1,0 +1,24 @@
+{
+  "system_name": "RAG Validation System",
+  "version": "1.0",
+  "default_output_dir": "outputs",
+  "default_log_file": "logs/validation.log",
+  "max_file_size_mb": 100,
+  "backup_suffix": ".backup",
+  "default_encoding": "utf-8",
+  "supported_file_types": {
+    "text": ["txt", "md", "rst"],
+    "pdf": ["pdf"],
+    "word": ["doc", "docx"],
+    "excel": ["xls", "xlsx", "csv"],
+    "json": ["json"],
+    "xml": ["xml", "html", "htm"],
+    "code": ["py", "js", "ts", "java", "cpp", "c", "h", "cs"],
+    "config": ["yml", "yaml", "ini", "cfg", "conf"]
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "date_format": "%Y-%m-%d %H:%M:%S"
+  }
+}

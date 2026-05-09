@@ -1,0 +1,28 @@
+# RAG Validation System - MANIFEST.in
+
+include README.md
+include LICENSE
+include requirements.txt
+include .env.example
+include pytest.ini
+include config.json
+
+recursive-include data *.json
+recursive-include data *.txt
+
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude .pytest_cache
+global-exclude .mypy_cache
+global-exclude htmlcov
+global-exclude .coverage
+global-exclude *.log
+
+prune logs
+prune outputs
+prune .git
+prune .github
+prune .venv
+prune venv
+prune env
