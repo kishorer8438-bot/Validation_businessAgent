@@ -19,8 +19,8 @@ class BasePayloadModel(BaseModel):
 
 class FileDetails(BasePayloadModel):
     file_path: str = Field(..., example="data/raw/sample.txt")
-    file_type: str = Field(..., example="text")
-    created_at: str = Field(..., example="2026-04-10 12:45:00")
+    file_type: Optional[str] = Field(None, example="text")
+    created_at: Optional[str] = Field(None, example="2026-04-10 12:45:00")
 
 
 class ValidationPayload(BasePayloadModel):
@@ -60,17 +60,11 @@ class PayloadWrapper(BasePayloadModel):
 class FileValidationRequest(BasePayloadModel):
     file_path: str = Field(..., example="data/raw/sample.txt")
     document_id: Optional[str] = Field(None, example="DOC001")
-    save_output: Optional[bool] = Field(False, example=True)
-    output_path: Optional[str] = Field(None, example="outputs/DOC001.json")
 
 
-class ValidateRequest(BasePayloadModel):
-    file_path: Optional[str] = Field(None, example="data/raw/sample.txt")
+class MinimalRequest(BasePayloadModel):
     document_id: Optional[str] = Field(None, example="DOC001")
-    save_output: Optional[bool] = Field(False, example=True)
-    output_path: Optional[str] = Field(None, example="outputs/DOC001.json")
-    standardized_data: Optional[StandardizedData] = None
-    payload: Optional[PayloadWrapper] = None
+    file_path: Optional[str] = Field(None, example="data/raw/sample.txt")
 
 
 class LangGraphValidateRequest(BasePayloadModel):
@@ -84,17 +78,12 @@ app = FastAPI(
 )
 
 
-def _resolve_payload(request: ValidateRequest) -> Dict[str, Any]:
-    if request.payload is not None:
-        return request.payload.payload.dict()
-
-    if request.standardized_data is not None:
-        return {
-            "document_id": request.document_id or "UNKNOWN",
-            "standardized_data": request.standardized_data.dict()
-        }
-
-    raise HTTPException(status_code=400, detail="Standardized payload is required when file_path is missing")
+def _build_response_payload(result: Dict[str, Any]) -> Dict[str, Any]:
+    # Ensure response matches the StandardizedPayload shape
+    return {
+        "document_id": result.get("document_id", "UNKNOWN"),
+        "standardized_data": result.get("standardized_data", result)
+    }
 
 
 def _maybe_save_output(result: Dict[str, Any], save_output: bool, output_path: Optional[str]) -> None:
@@ -116,42 +105,43 @@ def health() -> Dict[str, str]:
     return {"message": "RAG Validation API is running."}
 
 
-@app.post("/validate-file", response_model=Dict[str, Any], summary="Validate a file path")
-def validate_file(request: FileValidationRequest) -> Dict[str, Any]:
+@app.post("/validate-file", response_model=StandardizedPayload, summary="Validate a file path")
+def validate_file(request: FileValidationRequest, save_output: bool = False, output_path: Optional[str] = None) -> Dict[str, Any]:
     try:
         validator = DataValidator(request.file_path, request.document_id)
         result = validator.validate()
-        _maybe_save_output(result, request.save_output, request.output_path)
-        return result
+        _maybe_save_output(result, save_output, output_path)
+        return _build_response_payload(result)
     except Exception as e:
         write_log(f"API file validation failed: {str(e)}", "error")
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/validate-payload", response_model=Dict[str, Any], summary="Validate a standardized payload")
-def validate_payload(request_body: Union[StandardizedPayload, PayloadWrapper]) -> Dict[str, Any]:
+@app.post("/validate-payload", response_model=StandardizedPayload, summary="Validate a file using minimal payload")
+def validate_payload(request_body: MinimalRequest, save_output: bool = False, output_path: Optional[str] = None) -> Dict[str, Any]:
     try:
-        payload = request_body.payload.dict() if isinstance(request_body, PayloadWrapper) else request_body.dict()
-        validator = StandardizedDataValidator(payload)
-        return validator.validate()
+        if not request_body.file_path:
+            raise HTTPException(status_code=400, detail="file_path is required for payload validation")
+
+        validator = DataValidator(request_body.file_path, request_body.document_id)
+        result = validator.validate()
+        _maybe_save_output(result, save_output, output_path)
+        return _build_response_payload(result)
     except Exception as e:
         write_log(f"API payload validation failed: {str(e)}", "error")
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/validate", response_model=Dict[str, Any], summary="Validate either a file or a standardized payload")
-def validate(request: ValidateRequest) -> Dict[str, Any]:
+@app.post("/validate", response_model=StandardizedPayload, summary="Validate a file by minimal request")
+def validate(request: MinimalRequest, save_output: bool = False, output_path: Optional[str] = None) -> Dict[str, Any]:
     try:
-        if request.file_path:
-            validator = DataValidator(request.file_path, request.document_id)
-            result = validator.validate()
-        else:
-            payload = _resolve_payload(request)
-            validator = StandardizedDataValidator(payload)
-            result = validator.validate()
+        if not request.file_path:
+            raise HTTPException(status_code=400, detail="file_path is required")
 
-        _maybe_save_output(result, request.save_output, request.output_path)
-        return result
+        validator = DataValidator(request.file_path, request.document_id)
+        result = validator.validate()
+        _maybe_save_output(result, save_output, output_path)
+        return _build_response_payload(result)
     except HTTPException:
         raise
     except Exception as e:
@@ -159,11 +149,11 @@ def validate(request: ValidateRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/validate-langgraph", response_model=Dict[str, Any], summary="Validate input JSON using LangGraph and GPT-4")
+@app.post("/validate-langgraph", response_model=StandardizedPayload, summary="Validate input JSON using LangGraph and GPT-4")
 def validate_with_langgraph_endpoint(request: LangGraphValidateRequest) -> Dict[str, Any]:
     try:
         result = validate_with_langgraph(request.input_json)
-        return result
+        return _build_response_payload(result)
     except Exception as e:
         write_log(f"LangGraph validation failed: {str(e)}", "error")
         raise HTTPException(status_code=400, detail=str(e))

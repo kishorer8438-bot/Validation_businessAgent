@@ -45,7 +45,7 @@ example_output = {
 
 def validate_node(state: ValidationState) -> ValidationState:
     input_json = state['input_json']
-    prompt = f"""
+    prompt = f"""uvicorn src.api:app --reload
     Validate the following JSON data: {json.dumps(input_json)}.
     Check if it represents valid file details for a document validation system.
     Specifically:

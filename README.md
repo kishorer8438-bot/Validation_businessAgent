@@ -269,94 +269,47 @@ http://127.0.0.1:8000/docs
     ```json
     {
       "file_path": "data/raw/sample.txt",
-      "document_id": "DOC001",
-      "save_output": true,
-      "output_path": "outputs/DOC001.json"
+      "document_id": "DOC001"
     }
     ```
   - Example `curl`:
     ```bash
     curl -X POST "http://127.0.0.1:8000/validate-file" \
       -H "Content-Type: application/json" \
-      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001", "save_output": true, "output_path": "outputs/DOC001.json"}'
+      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
     ```
   - Returns the same standardized validation result as the CLI.
 
 - `POST /validate`
-  - Request body can be either a file validation request with a top-level `file_path`, or a standardized payload with `document_id` and `standardized_data`.
-  - For standardized payload, use this body:
+  - Request body should be a minimal request containing `file_path` (and optional `document_id`).
+  - Example request body:
     ```json
     {
-      "document_id": "DOC001",
-      "standardized_data": {
-        "file_details": {
-          "file_path": "data/raw/sample.txt",
-          "file_type": "text",
-          "created_at": "2026-04-10 12:45:00"
-        },
-        "validation": {
-          "file_exists": true,
-          "file_not_empty": true,
-          "file_readable": true,
-          "status": "SUCCESS"
-        },
-        "summary": {
-          "message": "Validation completed successfully",
-          "errors": null
-        },
-        "metadata": {
-          "processed_by": "RAG Validation System",
-          "version": "1.0",
-          "timestamp": "2026-04-10 12:45:00"
-        }
-      }
+      "file_path": "data/raw/sample.txt",
+      "document_id": "DOC001"
     }
     ```
   - Example `curl`:
     ```bash
     curl -X POST "http://127.0.0.1:8000/validate" \
       -H "Content-Type: application/json" \
-      -d '{"document_id": "DOC001", "standardized_data": {"file_details": {"file_path": "data/raw/sample.txt", "file_type": "text", "created_at": "2026-04-10 12:45:00"}, "validation": {"file_exists": true, "file_not_empty": true, "file_readable": true, "status": "SUCCESS"}, "summary": {"message": "Validation completed successfully", "errors": null}, "metadata": {"processed_by": "RAG Validation System", "version": "1.0", "timestamp": "2026-04-10 12:45:00"}}}'
+      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
     ```
-  - Works for both direct standardized payloads and wrapper payloads.
 
 - `POST /validate-payload`
   - Request body:
     ```json
     {
-      "document_id": "DOC001",
-      "standardized_data": {
-        "file_details": {
-          "file_path": "data/raw/sample.txt",
-          "file_type": "text",
-          "created_at": "2026-04-10 12:45:00"
-        },
-        "validation": {
-          "file_exists": true,
-          "file_not_empty": true,
-          "file_readable": true,
-          "status": "SUCCESS"
-        },
-        "summary": {
-          "message": "Validation completed successfully",
-          "errors": null
-        },
-        "metadata": {
-          "processed_by": "RAG Validation System",
-          "version": "1.0",
-          "timestamp": "2026-04-10 12:45:00"
-        }
-      }
+      "file_path": "data/raw/sample.txt",
+      "document_id": "DOC001"
     }
     ```
   - Example `curl`:
     ```bash
     curl -X POST "http://127.0.0.1:8000/validate-payload" \
       -H "Content-Type: application/json" \
-      -d '{"document_id": "DOC001", "standardized_data": {"file_details": {"file_path": "data/raw/sample.txt", "file_type": "text", "created_at": "2026-04-10 12:45:00"}, "validation": {"file_exists": true, "file_not_empty": true, "file_readable": true, "status": "SUCCESS"}, "summary": {"message": "Validation completed successfully", "errors": null}, "metadata": {"processed_by": "RAG Validation System", "version": "1.0", "timestamp": "2026-04-10 12:45:00"}}}'
+      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
     ```
-  - Notes:
-    - This endpoint accepts either the direct standardized payload shown above, or a wrapper object like `{"payload": <standardized_payload>}`.
 
 ## 📊 Output Format
 
