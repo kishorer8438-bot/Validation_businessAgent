@@ -5,7 +5,7 @@ Provides Swagger UI for file validation and standardized payload validation.
 
 from typing import Optional, Dict, Any, Union
 from fastapi import FastAPI, HTTPException, Body
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from .validator import DataValidator, StandardizedDataValidator
 from .utils import write_json, write_log
@@ -257,6 +257,12 @@ def validate(request_body: Dict[str, Any] = Body(
 
         # 1) Enterprise shape
         if isinstance(request_body.get("file_details"), dict) and request_body["file_details"].get("file_path"):
+            # Perform Pydantic validation of the enterprise schema so wrong types return 422
+            try:
+                ValidateRequest(**request_body)
+            except ValidationError as ve:
+                raise HTTPException(status_code=422, detail=str(ve))
+
             file_path = request_body["file_details"]["file_path"]
             document_id = request_body.get("document_id")
             validator = DataValidator(file_path, document_id)

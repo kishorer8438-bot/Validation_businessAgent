@@ -17,6 +17,35 @@ from .utils import (
     list_files, ValidationError, FileOperationError
 )
 
+# Expose a FastAPI app object so `uvicorn src.main:app` works.
+from fastapi import FastAPI
+try:
+    from .api import app as api_app
+except Exception:
+    api_app = None
+
+# Main ASGI app (keeps separate from src.api.app but will reuse its routes)
+app = FastAPI(title="RAG Validation API (main)", version="1.0")
+
+
+@app.get("/", summary="Service health")
+def root() -> dict:
+    return {"message": "RAG Validation API is running."}
+
+
+@app.get("/health", summary="Health check")
+def health() -> dict:
+    return {"message": "RAG Validation API is running."}
+
+# If the API app from src.api is available, copy its routes into this app
+# (skip root/health to avoid duplicate paths).
+if api_app is not None:
+    for route in api_app.router.routes:
+        path = getattr(route, "path", None)
+        if path in ("/", "/health"):
+            continue
+        app.router.routes.append(route)
+
 
 class ValidationConfig:
     """Configuration class for validation settings."""
@@ -173,6 +202,7 @@ def validate_payload_file(payload_path: str) -> Dict[str, Any]:
     If `payload_path` contains `standardized_data`, run `StandardizedDataValidator`.
     Otherwise, if it contains `file_details`, run `DataValidator` on the nested file path.
     """
+    payload = None
     try:
         payload = read_json(payload_path)
 
@@ -191,8 +221,9 @@ def validate_payload_file(payload_path: str) -> Dict[str, Any]:
         raise ValueError("Payload does not contain a recognized payload shape")
     except Exception as e:
         write_log(f"Payload validation failed for {payload_path}: {str(e)}", "error")
+        doc_id = payload.get("document_id") if isinstance(payload, dict) else "UNKNOWN"
         return {
-            "document_id": payload.get("document_id") if isinstance(payload, dict) else "UNKNOWN",
+            "document_id": doc_id,
             "validation_passed": False,
             "schema_errors": [f"Invalid JSON in file {payload_path}: {str(e)}"],
             "business_rule_violations": [],
