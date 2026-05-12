@@ -4,7 +4,7 @@ Provides Swagger UI for file validation and standardized payload validation.
 """
 
 from typing import Optional, Dict, Any, Union
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, Field
 
 from .validator import DataValidator, StandardizedDataValidator
@@ -131,7 +131,13 @@ def validate_file(request: FileValidationRequest) -> Dict[str, Any]:
 
 
 @app.post("/validate-payload", response_model=Dict[str, Any], summary="Validate a payload by file path")
-def validate_payload(request_body: ValidateRequest) -> Dict[str, Any]:
+def validate_payload(request_body: ValidateRequest = Body(
+    ...,
+    example={
+        "file_path": "data/raw/sample.txt",
+        "document_id": "DOC001"
+    }
+)) -> Dict[str, Any]:
     """Accept a minimal payload (document_id + file_path) and return
     the generated standardized validation result.
     """
@@ -149,7 +155,13 @@ def validate_payload(request_body: ValidateRequest) -> Dict[str, Any]:
 
 
 @app.post("/validate", response_model=Dict[str, Any], summary="Validate either a file or a standardized payload")
-def validate(request: ValidateRequest) -> Dict[str, Any]:
+def validate(request: ValidateRequest = Body(
+    ...,
+    example={
+        "file_path": "data/raw/sample.txt",
+        "document_id": "DOC001"
+    }
+)) -> Dict[str, Any]:
     try:
         if request.file_path:
             validator = DataValidator(request.file_path, request.document_id)
@@ -169,7 +181,10 @@ def validate(request: ValidateRequest) -> Dict[str, Any]:
 
 
 @app.post("/validate-langgraph", response_model=Dict[str, Any], summary="Validate input JSON using LangGraph and GPT-4")
-def validate_with_langgraph_endpoint(request: LangGraphValidateRequest) -> Dict[str, Any]:
+def validate_with_langgraph_endpoint(request: LangGraphValidateRequest = Body(
+    ...,
+    example={"input_json": {"file_path": "data/raw/sample.txt", "file_type": "text", "created_at": "2026-04-10 12:45:00"}}
+)) -> Dict[str, Any]:
     try:
         result = validate_with_langgraph(request.input_json)
         return result

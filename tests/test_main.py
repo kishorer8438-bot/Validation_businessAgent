@@ -45,7 +45,12 @@ def test_validate_payload_success():
 
     # The API now expects a minimal request (file_path + document_id);
     # use the file_path from the sample payload to request validation.
-    file_path = payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
+    # payload.json may be either legacy (contains standardized_data) or
+    # the new minimal form. Try both locations for the file_path.
+    file_path = (
+        payload.get("file_path") or
+        payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
+    )
     resp = client.post("/validate-payload", json={"file_path": file_path, "document_id": payload.get("document_id")})
     assert resp.status_code == 200
     body = resp.json()
