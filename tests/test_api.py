@@ -32,7 +32,8 @@ def test_invalid_payload():
     }
 
     response = client.post("/validate", json=payload)
-    assert response.status_code == 422
+    # Request no longer accepts `standardized_data` in the input; expect 400
+    assert response.status_code == 400
 
 
 # ❌ Test 4: Missing field
@@ -44,7 +45,8 @@ def test_missing_field():
     }
 
     response = client.post("/validate", json=payload)
-    assert response.status_code == 422
+    # Missing file_path/document_id should return 400 with new schema
+    assert response.status_code == 400
 
 
 # ❌ Test 5: Wrong data type
@@ -59,4 +61,5 @@ def test_wrong_datatype():
     }
 
     response = client.post("/validate", json=payload)
-    assert response.status_code == 422
+    # Sending unexpected structured `standardized_data` is no longer supported
+    assert response.status_code == 400

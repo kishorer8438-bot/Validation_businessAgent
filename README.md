@@ -269,47 +269,50 @@ http://127.0.0.1:8000/docs
     ```json
     {
       "file_path": "data/raw/sample.txt",
-      "document_id": "DOC001"
+      "document_id": "DOC001",
+      "save_output": true,
+      "output_path": "outputs/DOC001.json"
     }
     ```
   - Example `curl`:
     ```bash
     curl -X POST "http://127.0.0.1:8000/validate-file" \
       -H "Content-Type: application/json" \
-      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
+      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001", "save_output": true, "output_path": "outputs/DOC001.json"}'
     ```
   - Returns the same standardized validation result as the CLI.
 
-- `POST /validate`
-  - Request body should be a minimal request containing `file_path` (and optional `document_id`).
-  - Example request body:
-    ```json
-    {
-      "file_path": "data/raw/sample.txt",
-      "document_id": "DOC001"
-    }
-    ```
+ - `POST /validate`
+   - Request body should be a minimal input object with `file_path` (or `document_id` and `file_path`). The server generates and returns the full `standardized_data` in the response.
+   - Example request:
+     ```json
+     {
+       "file_path": "data/raw/sample.txt",
+       "document_id": "DOC001"
+     }
+     ```
   - Example `curl`:
     ```bash
     curl -X POST "http://127.0.0.1:8000/validate" \
       -H "Content-Type: application/json" \
-      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
+      -d '{"document_id": "DOC001", "standardized_data": {"file_details": {"file_path": "data/raw/sample.txt", "file_type": "text", "created_at": "2026-04-10 12:45:00"}, "validation": {"file_exists": true, "file_not_empty": true, "file_readable": true, "status": "SUCCESS"}, "summary": {"message": "Validation completed successfully", "errors": null}, "metadata": {"processed_by": "RAG Validation System", "version": "1.0", "timestamp": "2026-04-10 12:45:00"}}}'
     ```
+  - Works for both direct standardized payloads and wrapper payloads.
 
-- `POST /validate-payload`
-  - Request body:
-    ```json
-    {
-      "file_path": "data/raw/sample.txt",
-      "document_id": "DOC001"
-    }
-    ```
-  - Example `curl`:
-    ```bash
-    curl -X POST "http://127.0.0.1:8000/validate-payload" \
-      -H "Content-Type: application/json" \
-      -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
-    ```
+ - `POST /validate-payload`
+   - Request body should be a minimal input object (server will generate the standardized output). Example:
+     ```json
+     {
+       "file_path": "data/raw/sample.txt",
+       "document_id": "DOC001"
+     }
+     ```
+   - Example `curl`:
+     ```bash
+     curl -X POST "http://127.0.0.1:8000/validate-payload" \
+       -H "Content-Type: application/json" \
+       -d '{"file_path": "data/raw/sample.txt", "document_id": "DOC001"}'
+     ```
 
 ## 📊 Output Format
 

@@ -43,10 +43,13 @@ def test_validate_payload_success():
     with open("data/payload.json", "r", encoding="utf-8") as f:
         payload = json.load(f)
 
-    resp = client.post("/validate-payload", json=payload)
+    # The API now expects a minimal request (file_path + document_id);
+    # use the file_path from the sample payload to request validation.
+    file_path = payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
+    resp = client.post("/validate-payload", json={"file_path": file_path, "document_id": payload.get("document_id")})
     assert resp.status_code == 200
     body = resp.json()
-    assert body.get("validation_passed") is True
+    assert body.get("standardized_data", {}).get("validation", {}).get("status") == "SUCCESS"
 
 
 def test_validate_endpoint_with_file_and_payload():
@@ -55,17 +58,16 @@ def test_validate_endpoint_with_file_and_payload():
     assert resp1.status_code == 200
     assert resp1.json()["standardized_data"]["validation"]["status"] == "SUCCESS"
 
-    # payload variation (wrap the payload like the API expects)
+    # payload variation: request the same validation via minimal payload
     import json
     with open("data/payload.json", "r", encoding="utf-8") as f:
         payload = json.load(f)
 
-    # API ValidateRequest expects a PayloadWrapper under the key `payload`,
-    # which itself contains a `payload` field holding the StandardizedPayload.
-    resp2 = client.post("/validate", json={"payload": {"payload": payload}})
+    file_path = payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
+    resp2 = client.post("/validate", json={"file_path": file_path, "document_id": payload.get("document_id")})
     assert resp2.status_code == 200
     body2 = resp2.json()
-    assert body2.get("validation_passed") is True
+    assert body2.get("standardized_data", {}).get("validation", {}).get("status") == "SUCCESS"
 
 
 def test_validate_langgraph_endpoint_monkeypatched(monkeypatch):
