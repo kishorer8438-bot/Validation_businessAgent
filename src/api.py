@@ -3,7 +3,8 @@ FastAPI service for RAG Validation System.
 Provides Swagger UI for file validation and standardized payload validation.
 """
 
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel, Field, ValidationError
 
@@ -193,29 +194,89 @@ def validate_payload(request_body: Dict[str, Any] = Body(
     try:
         save_output = request_body.get("save_output", False)
         output_path = request_body.get("output_path")
+        # Helper to build professional response from standardized result
+        def _build_response_from_standardized(result: Dict[str, Any]) -> Dict[str, Any]:
+            std = result.get("standardized_data", {})
+            validation = std.get("validation", {})
+            summary = std.get("summary", {})
+            metadata = std.get("metadata", {})
+
+            # derive boolean validity and score
+            file_checks = [validation.get("file_exists"), validation.get("file_not_empty"), validation.get("file_readable")]
+            passed = sum(1 for v in file_checks if v)
+            total = len(file_checks)
+            score = round((passed / total) if total else 0.0, 2)
+
+            errors: List[str] = []
+            if summary.get("errors"):
+                if isinstance(summary.get("errors"), list):
+                    errors = summary.get("errors")
+                else:
+                    errors = [summary.get("errors")]
+
+            warnings: List[str] = []
+            # simple heuristic: unknown file type -> warning
+            file_type = std.get("file_details", {}).get("file_type")
+            if file_type in (None, "unknown"):
+                warnings.append("Unknown or undetermined file type")
+
+            processed_ts = summary.get("validation_timestamp") or metadata.get("timestamp") or datetime.now().isoformat()
+
+            return {
+                "document_id": result.get("document_id"),
+                "validation_status": validation.get("status", "VALIDATION_ERROR"),
+                "validation_result": {
+                    "is_valid": validation.get("status") == "SUCCESS",
+                    "validation_score": score,
+                    "errors": errors,
+                    "warnings": warnings,
+                },
+                "processed_timestamp": processed_ts
+            }
 
         # 1) Standardized (legacy) payload posted directly
         if isinstance(request_body.get("standardized_data"), dict):
             validator = StandardizedDataValidator(request_body)
-            result = validator.validate()
-            _maybe_save_output(result, save_output, output_path)
-            return result
+            raw = validator.validate()
+            response = _build_response_from_standardized(raw)
+            _maybe_save_output(raw, save_output, output_path)
+            return response
 
         # 2) Enterprise nested schema
         if isinstance(request_body.get("file_details"), dict) and request_body["file_details"].get("file_path"):
             file_path = request_body["file_details"]["file_path"]
             document_id = request_body.get("document_id")
             validator = DataValidator(file_path, document_id)
-            result = validator.validate()
-            _maybe_save_output(result, save_output, output_path)
-            return result
+
+            # simple validation checks (file exists, file type, empty values)
+            file_exists = validator.check_file_exists()
+            file_not_empty = validator.check_file_not_empty()
+            file_readable = validator.check_file_readable()
+
+            raw = validator.validate()
+
+            # If file type is unknown, include as a warning
+            ftype = raw.get("standardized_data", {}).get("file_details", {}).get("file_type")
+            if ftype == "unknown":
+                # attach warning into standardized result for downstream mapping
+                raw.setdefault("standardized_data", {}).setdefault("summary", {}).setdefault("warnings", ["Unknown file type"])
+
+            response = _build_response_from_standardized(raw)
+            _maybe_save_output(raw, save_output, output_path)
+            return response
 
         # 3) Minimal shape with top-level file_path
         if request_body.get("file_path"):
             validator = DataValidator(request_body["file_path"], request_body.get("document_id"))
-            result = validator.validate()
-            _maybe_save_output(result, save_output, output_path)
-            return result
+
+            file_exists = validator.check_file_exists()
+            file_not_empty = validator.check_file_not_empty()
+            file_readable = validator.check_file_readable()
+
+            raw = validator.validate()
+            response = _build_response_from_standardized(raw)
+            _maybe_save_output(raw, save_output, output_path)
+            return response
 
         raise HTTPException(status_code=400, detail="file_path is required to validate payload")
     except HTTPException:

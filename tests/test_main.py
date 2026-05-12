@@ -55,7 +55,9 @@ def test_validate_payload_success():
     resp = client.post("/validate-payload", json={"file_path": file_path, "document_id": payload.get("document_id")})
     assert resp.status_code == 200
     body = resp.json()
-    assert body.get("standardized_data", {}).get("validation", {}).get("status") == "SUCCESS"
+    # /validate-payload now returns a professional validation response
+    assert body.get("validation_status") == "SUCCESS"
+    assert body.get("validation_result", {}).get("is_valid") is True
 
 
 def test_validate_endpoint_with_file_and_payload():
