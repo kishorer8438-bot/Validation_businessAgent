@@ -155,3 +155,52 @@ def test_validator_main_guard_executes_and_exits(monkeypatch, tmp_path):
     globs = {'__name__': '__main__', 'DataValidator': validator_mod.DataValidator, 'sys': __import__('sys')}
     with pytest.raises(SystemExit):
         exec(compile(code, 'src/validator.py', 'exec'), globs)
+
+
+def test_get_file_type_detects_pdf_header(tmp_path):
+    p = tmp_path / "sample.bin"
+    p.write_bytes(b"%PDF-1.4\n1 0 obj\n")
+    dv = DataValidator(str(p))
+    assert dv._get_file_type() == 'pdf'
+
+
+def test_check_file_not_empty_exception_path(monkeypatch, tmp_path):
+    p = tmp_path / "f2.txt"
+    p.write_text("x")
+    dv = DataValidator(str(p))
+    # Force existence check to pass so _get_file_info is called inside check_file_not_empty
+    monkeypatch.setattr(dv, 'check_file_exists', lambda: True)
+    monkeypatch.setattr(dv, '_get_file_info', lambda: (_ for _ in ()).throw(Exception('boom')))
+    assert dv.check_file_not_empty() is False
+
+
+def test_main_prints_validator_json(monkeypatch, capsys):
+    import src.validator as validator_mod
+    from pathlib import Path
+
+    # Patch validate and to_json to return controlled values so print() runs
+    monkeypatch.setattr(validator_mod.DataValidator, 'validate', lambda self: {"ok": True})
+    monkeypatch.setattr(validator_mod.DataValidator, 'to_json', lambda self: '{"ok": true}')
+
+    src_text = Path('src/validator.py').read_text().splitlines()
+    start_idx = None
+    for i, ln in enumerate(src_text):
+        if ln.strip().startswith('if __name__'):
+            start_idx = i
+            break
+    assert start_idx is not None
+    block = '\n'.join(src_text[start_idx:])
+    code = '\n' * start_idx + block
+
+    globs = {'__name__': '__main__', 'DataValidator': validator_mod.DataValidator}
+    exec(compile(code, 'src/validator.py', 'exec'), globs)
+    captured = capsys.readouterr()
+    assert '{"ok": true}' in captured.out
+
+
+def test_business_agent_validate_required_structure_early_return():
+    payload = {"document_id": "D1", "standardized_data": {}}
+    agent = BusinessRulesAgent(payload)
+    # Directly invoke the internal checker to exercise the early return at the standardized check
+    agent._validate_required_structure()
+    assert any("Missing required key" in v for v in agent.violations)
