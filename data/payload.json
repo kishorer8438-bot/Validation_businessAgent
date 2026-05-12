@@ -1,18 +1,20 @@
 {
-  "document_id": "DOC001",
-  "document_type": "invoice",
-  "source_system": "ERP_System",
-  "uploaded_by": "Kishore",
-  "uploaded_at": "2026-05-12T10:30:00",
-    "file_details": {
-    "file_name": "sample.txt",
-    "file_path": "data/raw/sample.txt",
-    "file_type": "pdf",
-    "file_size_kb": 245
+  "document_id": "INV-2026-0001",
+  "validation_status": "FAILED",
+  "validation_result": {
+    "is_valid": false,
+    "validation_score": 0.54,
+    "errors": [
+      {
+        "field": "customer_email",
+        "message": "Field cannot be empty"
+      },
+      {
+        "field": "invoice_date",
+        "message": "Missing required field"
+      }
+    ],
+    "warnings": []
   },
-  "customer_details": {
-    "customer_id": "CUST1001",
-    "customer_name": "ABC Technologies",
-    "customer_email": "abc@example.com"
-  }
+  "processed_timestamp": "2026-05-12T15:35:20Z"
 }
