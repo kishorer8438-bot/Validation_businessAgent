@@ -283,12 +283,27 @@ http://127.0.0.1:8000/docs
   - Returns the same standardized validation result as the CLI.
 
  - `POST /validate`
-   - Request body should be a minimal input object with `file_path` (or `document_id` and `file_path`). The server generates and returns the full `standardized_data` in the response.
+ - `POST /validate`
+   - Request body should follow the enterprise input schema. The server generates and returns the full `standardized_data` in the response (validation_result, summary, metadata are response-only).
    - Example request:
      ```json
      {
-       "file_path": "data/raw/sample.txt",
-       "document_id": "DOC001"
+       "document_id": "DOC001",
+       "document_type": "invoice",
+       "source_system": "ERP_System",
+       "uploaded_by": "Kishore",
+       "uploaded_at": "2026-05-12T10:30:00",
+       "file_details": {
+         "file_name": "invoice_001.pdf",
+         "file_path": "data/raw/invoice_001.pdf",
+         "file_type": "pdf",
+         "file_size_kb": 245
+       },
+       "customer_details": {
+         "customer_id": "CUST1001",
+         "customer_name": "ABC Technologies",
+         "customer_email": "abc@example.com"
+       }
      }
      ```
   - Example `curl`:
@@ -300,11 +315,26 @@ http://127.0.0.1:8000/docs
   - Works for both direct standardized payloads and wrapper payloads.
 
  - `POST /validate-payload`
-   - Request body should be a minimal input object (server will generate the standardized output). Example:
+ - `POST /validate-payload`
+   - Request body should follow the enterprise input schema (server will generate the standardized output). Example:
      ```json
      {
-       "file_path": "data/raw/sample.txt",
-       "document_id": "DOC001"
+       "document_id": "DOC001",
+       "document_type": "invoice",
+       "source_system": "ERP_System",
+       "uploaded_by": "Kishore",
+       "uploaded_at": "2026-05-12T10:30:00",
+       "file_details": {
+         "file_name": "invoice_001.pdf",
+         "file_path": "data/raw/invoice_001.pdf",
+         "file_type": "pdf",
+         "file_size_kb": 245
+       },
+       "customer_details": {
+         "customer_id": "CUST1001",
+         "customer_name": "ABC Technologies",
+         "customer_email": "abc@example.com"
+       }
      }
      ```
    - Example `curl`:

@@ -168,18 +168,33 @@ def validate_single_file(file_path: str, config: ValidationConfig,
 
 
 def validate_payload_file(payload_path: str) -> Dict[str, Any]:
-    """Validate a standardized JSON payload file."""
+    """Validate either a standardized payload file or the enterprise input schema.
+
+    If `payload_path` contains `standardized_data`, run `StandardizedDataValidator`.
+    Otherwise, if it contains `file_details`, run `DataValidator` on the nested file path.
+    """
     try:
         payload = read_json(payload_path)
-        validator = StandardizedDataValidator(payload)
-        result = validator.validate()
-        return result
+
+        # Standardized payload (legacy)
+        if isinstance(payload, dict) and payload.get("standardized_data"):
+            validator = StandardizedDataValidator(payload)
+            return validator.validate()
+
+        # Enterprise input schema with nested file_details
+        if isinstance(payload, dict) and payload.get("file_details") and payload["file_details"].get("file_path"):
+            file_path = payload["file_details"]["file_path"]
+            document_id = payload.get("document_id")
+            validator = DataValidator(file_path, document_id)
+            return validator.validate()
+
+        raise ValueError("Payload does not contain a recognized payload shape")
     except Exception as e:
         write_log(f"Payload validation failed for {payload_path}: {str(e)}", "error")
         return {
-            "document_id": "UNKNOWN",
+            "document_id": payload.get("document_id") if isinstance(payload, dict) else "UNKNOWN",
             "validation_passed": False,
-            "schema_errors": [str(e)],
+            "schema_errors": [f"Invalid JSON in file {payload_path}: {str(e)}"],
             "business_rule_violations": [],
             "source": "standardized_payload"
         }

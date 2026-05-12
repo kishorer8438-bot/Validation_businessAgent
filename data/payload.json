@@ -1,4 +1,18 @@
 {
   "document_id": "DOC001",
-  "file_path": "data/raw/sample.txt"
+  "document_type": "invoice",
+  "source_system": "ERP_System",
+  "uploaded_by": "Kishore",
+  "uploaded_at": "2026-05-12T10:30:00",
+    "file_details": {
+    "file_name": "sample.txt",
+    "file_path": "data/raw/sample.txt",
+    "file_type": "pdf",
+    "file_size_kb": 245
+  },
+  "customer_details": {
+    "customer_id": "CUST1001",
+    "customer_name": "ABC Technologies",
+    "customer_email": "abc@example.com"
+  }
 }

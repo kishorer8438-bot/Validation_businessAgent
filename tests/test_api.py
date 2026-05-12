@@ -13,8 +13,22 @@ def test_home():
 # ✅ Test 2: Valid payload
 def test_valid_payload():
     payload = {
-        "file_path": "rag_project/data/raw/sample.txt",
-        "document_id": "DOC001"
+        "document_id": "DOC001",
+        "document_type": "invoice",
+        "source_system": "ERP_System",
+        "uploaded_by": "Kishore",
+        "uploaded_at": "2026-05-12T10:30:00",
+        "file_details": {
+            "file_name": "sample.txt",
+            "file_path": "rag_project/data/raw/sample.txt",
+            "file_type": "text",
+            "file_size_kb": 1
+        },
+        "customer_details": {
+            "customer_id": "CUST1001",
+            "customer_name": "ABC Technologies",
+            "customer_email": "abc@example.com"
+        }
     }
 
     response = client.post("/validate", json=payload)
@@ -26,40 +40,56 @@ def test_valid_payload():
 
 # ❌ Test 3: Invalid payload (empty data)
 def test_invalid_payload():
+    # Missing required fields (no file_details)
     payload = {
         "document_id": "",
-        "standardized_data": {}
+        "document_type": "",
+        "source_system": "",
+        "uploaded_by": "",
+        "uploaded_at": "",
+        "customer_details": {}
     }
 
     response = client.post("/validate", json=payload)
-    # Request no longer accepts `standardized_data` in the input; expect 400
-    assert response.status_code == 400
+    assert response.status_code == 422 or response.status_code == 400
 
 
 # ❌ Test 4: Missing field
 def test_missing_field():
+    # Missing file_details entirely
     payload = {
-        "standardized_data": {
-            "name": "John"
-        }
+        "document_id": "DOC002",
+        "document_type": "invoice",
+        "source_system": "ERP_System",
+        "uploaded_by": "Kishore",
+        "uploaded_at": "2026-05-12T10:30:00"
     }
 
     response = client.post("/validate", json=payload)
-    # Missing file_path/document_id should return 400 with new schema
-    assert response.status_code == 400
+    assert response.status_code == 422 or response.status_code == 400
 
 
 # ❌ Test 5: Wrong data type
 def test_wrong_datatype():
+    # Wrong data types in enterprise schema (file_size_kb should be int)
     payload = {
-        "document_id": "DOC001",
-        "standardized_data": {
-            "name": "John",
-            "invoice_no": "INV-001",
-            "amount": "five thousand"   # wrong type
+        "document_id": "DOC003",
+        "document_type": "invoice",
+        "source_system": "ERP_System",
+        "uploaded_by": "Kishore",
+        "uploaded_at": "2026-05-12T10:30:00",
+        "file_details": {
+            "file_name": "invoice_003.pdf",
+            "file_path": "data/raw/invoice_003.pdf",
+            "file_type": "pdf",
+            "file_size_kb": "two hundred"
+        },
+        "customer_details": {
+            "customer_id": "CUST1003",
+            "customer_name": "XYZ Corp",
+            "customer_email": "xyz@example.com"
         }
     }
 
     response = client.post("/validate", json=payload)
-    # Sending unexpected structured `standardized_data` is no longer supported
-    assert response.status_code == 400
+    assert response.status_code == 422 or response.status_code == 400

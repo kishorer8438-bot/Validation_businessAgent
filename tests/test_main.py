@@ -49,6 +49,7 @@ def test_validate_payload_success():
     # the new minimal form. Try both locations for the file_path.
     file_path = (
         payload.get("file_path") or
+        payload.get("file_details", {}).get("file_path") or
         payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
     )
     resp = client.post("/validate-payload", json={"file_path": file_path, "document_id": payload.get("document_id")})
@@ -68,7 +69,11 @@ def test_validate_endpoint_with_file_and_payload():
     with open("data/payload.json", "r", encoding="utf-8") as f:
         payload = json.load(f)
 
-    file_path = payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
+    file_path = (
+        payload.get("file_path") or
+        payload.get("file_details", {}).get("file_path") or
+        payload.get("standardized_data", {}).get("file_details", {}).get("file_path")
+    )
     resp2 = client.post("/validate", json={"file_path": file_path, "document_id": payload.get("document_id")})
     assert resp2.status_code == 200
     body2 = resp2.json()
@@ -104,7 +109,8 @@ def test_main_functions_direct_calls(tmp_path):
 
     # test validate_payload_file
     payload_res = main_mod.validate_payload_file("data/payload.json")
-    assert payload_res.get("validation_passed") is True
+    # For enterprise or file-based payloads, we expect a standardized_data result
+    assert payload_res.get("standardized_data", {}).get("validation", {}).get("status") == "SUCCESS"
 
     # test validate_batch
     files = [Path("data/raw/sample.txt"), Path("data/raw/test.txt")]
