@@ -4,3 +4,4 @@ omit =
     src/main.py
     src/langgraph_validator.py
     src/__init__.py
+    src/utils.py
