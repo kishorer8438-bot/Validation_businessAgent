@@ -18,27 +18,27 @@ class BasePayloadModel(BaseModel):
 
 
 class FileDetails(BasePayloadModel):
-    file_path: str = Field(..., json_schema_extra={"examples": {"example": {"value": "data/raw/sample.txt"}}})
-    file_type: str = Field(..., json_schema_extra={"examples": {"example": {"value": "text"}}})
-    created_at: str = Field(..., json_schema_extra={"examples": {"example": {"value": "2026-04-10 12:45:00"}}})
+    file_path: str = Field(..., example="data/raw/sample.txt")
+    file_type: str = Field(..., example="text")
+    created_at: str = Field(..., example="2026-04-10 12:45:00")
 
 
 class ValidationPayload(BasePayloadModel):
-    file_exists: bool = Field(..., json_schema_extra={"examples": {"example": {"value": True}}})
-    file_not_empty: bool = Field(..., json_schema_extra={"examples": {"example": {"value": True}}})
-    file_readable: bool = Field(..., json_schema_extra={"examples": {"example": {"value": True}}})
-    status: str = Field(..., json_schema_extra={"examples": {"example": {"value": "SUCCESS"}}})
+    file_exists: bool = Field(..., example=True)
+    file_not_empty: bool = Field(..., example=True)
+    file_readable: bool = Field(..., example=True)
+    status: str = Field(..., example="SUCCESS")
 
 
 class SummaryPayload(BasePayloadModel):
-    message: str = Field(..., json_schema_extra={"examples": {"example": {"value": "Validation completed successfully"}}})
-    errors: Optional[str] = Field(None, json_schema_extra={"examples": {"example": {"value": None}}})
+    message: str = Field(..., example="Validation completed successfully")
+    errors: Optional[str] = Field(None, example=None)
 
 
 class MetadataPayload(BasePayloadModel):
-    processed_by: str = Field(..., json_schema_extra={"examples": {"example": {"value": "RAG Validation System"}}})
-    version: str = Field(..., json_schema_extra={"examples": {"example": {"value": "1.0"}}})
-    timestamp: str = Field(..., json_schema_extra={"examples": {"example": {"value": "2026-04-10 12:45:00"}}})
+    processed_by: str = Field(..., example="RAG Validation System")
+    version: str = Field(..., example="1.0")
+    timestamp: str = Field(..., example="2026-04-10 12:45:00")
 
 
 class StandardizedData(BasePayloadModel):
@@ -49,7 +49,7 @@ class StandardizedData(BasePayloadModel):
 
 
 class StandardizedPayload(BasePayloadModel):
-    document_id: str = Field(..., json_schema_extra={"examples": {"example": {"value": "DOC001"}}})
+    document_id: str = Field(..., example="DOC001")
     standardized_data: StandardizedData
 
 
@@ -58,23 +58,23 @@ class PayloadWrapper(BasePayloadModel):
 
 
 class FileValidationRequest(BasePayloadModel):
-    file_path: str = Field(..., json_schema_extra={"examples": {"example": {"value": "data/raw/sample.txt"}}})
-    document_id: Optional[str] = Field(None, json_schema_extra={"examples": {"example": {"value": "DOC001"}}})
-    save_output: Optional[bool] = Field(False, json_schema_extra={"examples": {"example": {"value": True}}})
-    output_path: Optional[str] = Field(None, json_schema_extra={"examples": {"example": {"value": "outputs/DOC001.json"}}})
+    file_path: str = Field(..., example="data/raw/sample.txt")
+    document_id: Optional[str] = Field(None, example="DOC001")
+    save_output: Optional[bool] = Field(False, example=True)
+    output_path: Optional[str] = Field(None, example="outputs/DOC001.json")
 
 # Request-side models for enterprise input schema
 class RequestFileDetails(BasePayloadModel):
-    file_name: str = Field(..., json_schema_extra={"examples": {"example": {"value": "invoice_001.pdf"}}})
-    file_path: str = Field(..., json_schema_extra={"examples": {"example": {"value": "data/raw/invoice_001.pdf"}}})
-    file_type: str = Field(..., json_schema_extra={"examples": {"example": {"value": "pdf"}}})
-    file_size_kb: int = Field(..., json_schema_extra={"examples": {"example": {"value": 245}}})
+    file_name: str = Field(..., example="invoice_001.pdf")
+    file_path: str = Field(..., example="data/raw/invoice_001.pdf")
+    file_type: str = Field(..., example="pdf")
+    file_size_kb: int = Field(..., example=245)
 
 
 class RequestCustomerDetails(BasePayloadModel):
-    customer_id: str = Field(..., json_schema_extra={"examples": {"example": {"value": "CUST1001"}}})
-    customer_name: str = Field(..., json_schema_extra={"examples": {"example": {"value": "ABC Technologies"}}})
-    customer_email: str = Field(..., json_schema_extra={"examples": {"example": {"value": "abc@example.com"}}})
+    customer_id: str = Field(..., example="CUST1001")
+    customer_name: str = Field(..., example="ABC Technologies")
+    customer_email: str = Field(..., example="abc@example.com")
 
 
 class ValidateRequest(BasePayloadModel):
@@ -83,15 +83,15 @@ class ValidateRequest(BasePayloadModel):
     Clients send metadata and file details; the server returns the
     `standardized_data` including validation_result, summary, and metadata.
     """
-    document_id: str = Field(..., json_schema_extra={"examples": {"example": {"value": "DOC001"}}})
-    document_type: str = Field(..., json_schema_extra={"examples": {"example": {"value": "invoice"}}})
-    source_system: str = Field(..., json_schema_extra={"examples": {"example": {"value": "ERP_System"}}})
-    uploaded_by: str = Field(..., json_schema_extra={"examples": {"example": {"value": "Kishore"}}})
-    uploaded_at: str = Field(..., json_schema_extra={"examples": {"example": {"value": "2026-05-12T10:30:00"}}})
+    document_id: str = Field(..., example="DOC001")
+    document_type: str = Field(..., example="invoice")
+    source_system: str = Field(..., example="ERP_System")
+    uploaded_by: str = Field(..., example="Kishore")
+    uploaded_at: str = Field(..., example="2026-05-12T10:30:00")
     file_details: RequestFileDetails
     customer_details: RequestCustomerDetails
-    save_output: Optional[bool] = Field(False, json_schema_extra={"examples": {"example": {"value": True}}})
-    output_path: Optional[str] = Field(None, json_schema_extra={"examples": {"example": {"value": "outputs/DOC001.json"}}})
+    save_output: Optional[bool] = Field(False, example=True)
+    output_path: Optional[str] = Field(None, example="outputs/DOC001.json")
 
 
 class LangGraphValidateRequest(BasePayloadModel):
