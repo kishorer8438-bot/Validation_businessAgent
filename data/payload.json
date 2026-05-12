@@ -1,20 +1,25 @@
 {
   "document_id": "INV-2026-0001",
-  "validation_status": "FAILED",
-  "validation_result": {
-    "is_valid": false,
-    "validation_score": 0.54,
-    "errors": [
-      {
-        "field": "customer_email",
-        "message": "Field cannot be empty"
-      },
-      {
-        "field": "invoice_date",
-        "message": "Missing required field"
-      }
-    ],
-    "warnings": []
+  "file_path": "data/raw/sample.txt",
+  "document_type": "invoice",
+  "source_system": "ERP_System",
+  "uploaded_by": "Kishore",
+  "uploaded_at": "2026-05-12T15:35:20Z",
+  "file_details": {
+    "file_path": "data/raw/sample.txt",
+    "file_type": "text",
+    "filename": "sample.txt"
   },
-  "processed_timestamp": "2026-05-12T15:35:20Z"
+  "customer_details": {
+    "customer_id": "CUST1001",
+    "customer_name": "ABC Technologies",
+    "customer_email": "billing@abctech.example"
+  },
+  "invoice": {
+    "invoice_number": "INV-2026-0001",
+    "invoice_date": "2026-05-10",
+    "due_date": "2026-06-10",
+    "total_amount": 1245.50,
+    "currency": "USD"
+  }
 }
