@@ -1,0 +1,6 @@
+[run]
+omit =
+    src/api.py
+    src/main.py
+    src/langgraph_validator.py
+    src/__init__.py
