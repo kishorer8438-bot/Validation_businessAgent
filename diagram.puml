@@ -1,4 +1,4 @@
-@startuml
+@startuml ValidationDiagram
 
 actor User
 
