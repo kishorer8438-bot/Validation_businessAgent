@@ -1,0 +1,20 @@
+@startuml
+
+actor User
+
+participant "FastAPI API" as API
+participant "Validation Agent" as Agent
+participant "Validator Engine" as Validator
+participant "Business Rule Engine" as Rules
+participant "Response Generator" as Response
+
+User -> API : Send Invoice JSON
+API -> Agent : Validate Request
+Agent -> Validator : Check Fields
+Validator -> Rules : Apply Business Rules
+Rules --> Validator : Validation Result
+Validator -> Response : Generate Output
+Response --> API : JSON Response
+API --> User : SUCCESS / FAILED
+
+@enduml
