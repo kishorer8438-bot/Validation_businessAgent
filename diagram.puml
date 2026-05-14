@@ -2,11 +2,14 @@
 
 actor User
 
-participant "FastAPI API" as API
-participant "Validation Agent" as Agent
-participant "Validator Engine" as Validator
-participant "Business Rule Engine" as Rules
-participant "Response Generator" as Response
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+
+participant "FastAPI API" as API #1E90FF
+participant "Validation Agent" as Agent #FFA500
+participant "Validator Engine" as Validator #2ECC71
+participant "Business Rule Engine" as Rules #FFD700
+participant "Response Generator" as Response #9B59B6
 
 User -> API : Send Invoice JSON
 API -> Agent : Validate Request
