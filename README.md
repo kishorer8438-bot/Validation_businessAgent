@@ -150,11 +150,9 @@ Typical response produced by the service:
 
 ---
 
-## 10. UML Sequence Diagram 📈
+## 10. UML Sequence Diagram
 
-High-level flow (PlantUML):
-
-![UML Sequence Diagram](https://www.plantuml.com/plantuml/svg/RPB1ReCm44Jl-nMht57l7AfG0XLLbKH1wTs25RNg69UrA_NlkuO4GjG3Ckmy3JChRzchmOUBmGzbTAkyxkrEgsvG5m3L-7x0CzC0u0JJZNRAUjoKYdrsh52U3IgEvnfOp33hoFg9Yc__SlANmdRQqiZDmpNx4bW8PZm5G_Ty_EOrUo9slMN2Lx8qHA-9l8u1OYbCdcDoJB4css9bVthT4BxLXpt4UPHZP06kaKWSlWEnXqaGOccGOlv9pHUMcapBi0X2ZH65o9mplxXgmZ29oOFPtGebTZ3-mV7MCBrr93m4xuA7MKhcWh7Jqdui9zgu16b_plEYhl49ownwBtO0Mzc7t8a_)
+![Validation Business Agent Workflow](out/diagram/diagram.png)
 
 Source: [diagram.puml](diagram.puml)
 
