@@ -1,25 +1,58 @@
+
 {
-  "document_id": "INV-2026-0001",
-  "file_path": "data/raw/sample.txt",
-  "document_type": "invoice",
-  "source_system": "ERP_System",
-  "uploaded_by": "Kishore",
-  "uploaded_at": "2026-05-12T15:35:20Z",
+  "document_id": " inv-2026/0001 ",
+  "file_path": "DATA\\RAW_FILES\\Invoices\\SAMPLE_FINAL.TXT",
+  "document_type": "Invoice Bill Copy",
+  "source_system": "erp legacy system",
+  "uploaded_by": " kishore r ",
+  "uploaded_at": "12-05-2026 03:35 PM",
+
   "file_details": {
-    "file_path": "data/raw/sample.txt",
-    "file_type": "text",
-    "filename": "sample.txt"
+    "file_path": "DATA\\RAW_FILES\\Invoices\\SAMPLE_FINAL.TXT",
+    "file_type": "TEXT DOCUMENT",
+    "filename": " SAMPLE_FINAL.TXT ",
+    "file_size": "1.5 MB",
+    "checksum": " abcd1234xyz "
   },
+
   "customer_details": {
-    "customer_id": "CUST1001",
-    "customer_name": "ABC Technologies",
-    "customer_email": "billing@abctech.example"
+    "customer_id": " cust-1001 ",
+    "customer_name": " abc technologies private limited ",
+    "customer_email": " Billing@ABCTECH.Example ",
+    "customer_phone": " +91-98765 43210 ",
+    "customer_address": " 12 , OMR Road , Chennai "
   },
+
+  "vendor_details": {
+    "vendor_id": " vend-2001 ",
+    "vendor_name": " global software solutions ",
+    "vendor_email": " SUPPORT@globalsoft.COM "
+  },
+
   "invoice": {
-    "invoice_number": "INV-2026-0001",
-    "invoice_date": "2026-05-10",
-    "due_date": "2026-06-10",
-    "total_amount": 1245.50,
-    "currency": "USD"
-  }
+    "invoice_number": " inv 2026 0001 ",
+    "invoice_date": "10/05/2026",
+    "due_date": "10-06-2026",
+    "payment_status": " Pending ",
+    "payment_method": " bank transfer ",
+    "subtotal": "$1,100.00",
+    "tax": "$145.50",
+    "discount": "5%",
+    "total_amount": "$1,245.50",
+    "currency": "$"
+  },
+
+  "items": [
+    {
+      "item_name": " ai development service ",
+      "quantity": "2",
+      "unit_price": "$500"
+    },
+    {
+      "item_name": " cloud hosting ",
+      "quantity": "1",
+      "unit_price": "$245.50"
+    }
+  ]
 }
+```
