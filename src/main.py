@@ -1,5 +1,12 @@
-from fastapi import FastAPI     
+from fastapi import FastAPI
+
 app = FastAPI()
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the validation service!"}
+
 
 @app.post("/validate-payload")
 def validate_payload(data: dict):
