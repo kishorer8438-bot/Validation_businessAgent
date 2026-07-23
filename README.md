@@ -1,219 +1,21 @@
-<!--
-  README.md — Validation Business Agent
-  Polished for enterprise review and portfolio use.
--->
-
-# Validation Business Agent 🧾
-
-Enterprise-ready invoice validation microservice.
-
-This project validates invoice JSON payloads using schema checks and layered business-rule validators, returning structured validation results suitable for automated reconciliation and downstream processing.
-
----
-
-## 1. Project Overview
-
-- Purpose: Validate invoices for correctness and business compliance before downstream processing.
-- Outputs: validation status, score, errors, warnings, and a detailed checks array.
-- Audience: integrators, SRE/DevOps, and data-validation teams.
-
----
-
-## 2. Key Features ✅
-
-- Schema validation (required fields, types)
-- Business-rule validation (totals, tax formats, currency rules)
-- Extensible validator chain (plug new rules easily)
-- FastAPI-based HTTP API for synchronous validation
-- Audit-ready JSON output and optional persistence
-- Comprehensive test suite with full coverage (165 tests, 100%)
-
----
-
-## 3. Tech Stack 🧰
-
-- Python 3.10+
-- FastAPI (HTTP API)
-- Pytest (testing)
-- PlantUML (architecture diagram)
-- Optional: Uvicorn for local serving
-
----
-
-## 4. Project Architecture 📐
-
-High level components:
-
-- API (FastAPI): receives payloads and returns results.
-- Validation Agent: orchestrates validators and aggregates results.
-- Validators: schema validator, business-rule validators, optional AI/third-party validators.
-- Response Formatter: normalizes results into a standard output shape.
-
-Sequence (see diagram below): Client -> API -> Validation Agent -> Validators -> Aggregator -> API -> Client
-
----
-
-## 5. Installation Guide 🛠️
-
-Clone and prepare the environment:
-
-```bash
-git clone https://github.com/kishore8438r-eng/Validation_BusinessAgent.git
-cd Validation_BusinessAgent
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-# macOS / Linux
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Run locally (development):
-
-```bash
-uvicorn src.main:app --reload --port 8000
-```
-
-Open API docs: http://localhost:8000/docs
-
----
-
-## 6. API Usage 🚀
-
-POST /validate
-
-- Description: Validate an invoice JSON payload.
-- Content-Type: `application/json`
-
-Example (curl):
-
-```bash
-curl -s -X POST http://localhost:8000/validate \
-  -H "Content-Type: application/json" \
-  -d @sample_input.json
-```
-
-GET /health — liveness/readiness probe
-
----
-
-## 7. Validation Workflow 🔍
-
-1. Ingestion: API receives payload and performs basic sanitation.
-2. Schema Validation: required fields and types are checked; failures return early with details.
-3. Business Rules: Validators check totals, tax IDs, currencies, thresholds, and organization-specific rules.
-4. Aggregation: Results are tagged with severity (error/warning/info), a validity flag, and a summary score.
-5. Response: normalized JSON with `valid`, `summary`, `checks`, and a timestamp.
-
-Design principles: fail-fast on schema errors, clear remediation messages, and modular validators for extensibility.
-
----
-
-## 8. Sample Input 📥
-
-Save the example below as `sample_input.json` for local testing.
-
-```json
-{
-  "invoice_id": "INV-2026-0001",
-  "date": "2026-05-01",
-  "supplier": {"name": "Acme Supplies Ltd.", "tax_id": "GB123456789"},
-  "buyer": {"name": "Contoso Ltd.", "tax_id": "GB987654321"},
-  "items": [
-    {"description": "Widget A", "quantity": 10, "unit_price": 19.99, "currency": "USD"},
-    {"description": "Widget B", "quantity": 5, "unit_price": 49.50, "currency": "USD"}
-  ],
-  "total_amount": 399.40,
-  "metadata": {"origin": "EDI", "received_at": "2026-05-02T10:15:30Z"}
-}
-```
-
----
-
-## 9. Sample Output 📤
-
-Typical response produced by the service:
-
-```json
-{
-  "document_id": "INV-2026-0001",
-  "validation_status": "SUCCESS",
-  "validation_result": {
-    "is_valid": true,
-    "validation_score": 1,
-    "errors": [],
-    "warnings": []
-  },
-  "processed_timestamp": "2026-05-13T08:45:59.331717"
-}
-```
-
----
-
-## 10. UML Sequence Diagram
-
-![Validation Business Agent Workflow](out/diagram/diagram.png)
-
-Source: [diagram.puml](diagram.puml)
-
----
-
-## 11. Testing & Coverage 🧪
-
-- Test runner: `pytest`
-- Current status: **165 tests passed** ✅
-- Coverage: **100%** across core modules
-
-Run tests locally:
-
-```bash
-pytest -q
-coverage run -m pytest && coverage report -m
-```
-
-CI integration: include these commands in your pipeline to fail on regressions.
-
----
-
-## 12. Future Enhancements 🔭
-
-- Country-specific VAT and PO/invoice matching plugins
-- Support for XML / EDIFACT adapters and file-format adapters
-- Asynchronous batch processing (Celery, queueing)
-- Authentication, RBAC, and API rate-limiting
-- Observability: tracing, structured logs, and metrics
-
----
-
-## 13. Contributors
-
-* Project Team
-
----
-
-For changes, follow the guidelines in `CONTRIBUTING.md`.
-
 # 🚀 Validation Business Agent
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green?logo=fastapi)
 ![Pytest](https://img.shields.io/badge/Tests-165%20Passed-success)
 ![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
-Enterprise-ready invoice validation microservice built using **Python**, **FastAPI**, and a modular **Business Validation Engine**.
+Enterprise-ready Validation Business Agent built using **Python**, **FastAPI**, and a modular **Business Validation Engine**. This application validates invoice payloads using schema validation and business rules, returning structured JSON responses for enterprise workflows.
 
 ---
 
 # 📖 Project Overview
 
-Validation Business Agent is a production-ready invoice validation service designed to validate structured business documents before downstream processing.
-
-The system validates invoice payloads using schema validation and business-rule validation, then returns structured JSON responses that can be consumed by enterprise applications, ERP systems, and automated financial workflows.
+Validation Business Agent is designed to validate structured invoice data before downstream processing. It performs schema validation, applies business rules, and returns standardized validation results that can be integrated into enterprise systems.
 
 ---
 
-# ✨ Key Features
+# ✨ Features
 
 - ✅ Invoice Payload Validation
 - ✅ Schema Validation
@@ -222,9 +24,9 @@ The system validates invoice payloads using schema validation and business-rule 
 - ✅ REST API using FastAPI
 - ✅ Standardized JSON Responses
 - ✅ Error & Warning Classification
-- ✅ Enterprise Ready Architecture
 - ✅ Swagger API Documentation
-- ✅ High Test Coverage
+- ✅ Enterprise-ready Architecture
+- ✅ Comprehensive Test Coverage
 
 ---
 
@@ -235,9 +37,9 @@ The system validates invoice payloads using schema validation and business-rule 
 | Python 3.11 | Backend Development |
 | FastAPI | REST API Framework |
 | Uvicorn | ASGI Server |
-| Pytest | Testing |
+| Pytest | Testing Framework |
 | JSON | Data Exchange |
-| Mermaid | Architecture Documentation |
+| PlantUML | Architecture Diagram |
 
 ---
 
@@ -246,13 +48,13 @@ The system validates invoice payloads using schema validation and business-rule 
 ```mermaid
 flowchart LR
 
-A["👤 Client"]
-B["🚀 FastAPI API"]
-C["📦 Validation Agent"]
-D["🧠 Validation Engine"]
-E["📋 Business Rule Validator"]
-F["📊 Response Formatter"]
-G["📄 JSON Response"]
+A[Client]
+B[FastAPI API]
+C[Validation Agent]
+D[Validation Engine]
+E[Business Rule Validator]
+F[Response Formatter]
+G[JSON Response]
 
 A -->|POST /validate-payload| B
 B --> C
@@ -261,6 +63,70 @@ D --> E
 E --> F
 F --> G
 G --> A
+```
+
+---
+
+# 📂 Project Structure
+
+```text
+Validation_BusinessAgent/
+│
+├── src/
+│   ├── main.py
+│   ├── business_agent.py
+│   ├── validation_engine.py
+│   └── utils.py
+│
+├── docs/
+├── tests/
+├── out/
+│   └── diagram/
+│       └── diagram.png
+│
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
+
+# ⚙️ Installation
+
+```bash
+git clone https://github.com/kishore8438r-eng/Validation_BusinessAgent.git
+
+cd Validation_BusinessAgent
+
+python -m venv .venv
+
+# Windows
+.venv\Scripts\activate
+
+# Linux / macOS
+source .venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+---
+
+# ▶️ Run the Application
+
+```bash
+uvicorn src.main:app --reload
+```
+
+Application URL
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger Documentation
+
+```
+http://127.0.0.1:8000/docs
 ```
 
 ---
@@ -279,31 +145,82 @@ participant Rules as Business Rule Validator
 participant Response
 
 Client->>API: POST /validate-payload
-API->>Agent: Receive JSON Payload
+API->>Agent: Receive Invoice Payload
 Agent->>Engine: Validate Schema
 Engine->>Rules: Apply Business Rules
 Rules-->>Engine: Validation Result
-Engine-->>Response: Generate JSON Response
-Response-->>Client: Return Validation Result
+Engine-->>Response: Format JSON Response
+Response-->>Client: Validation Result
 ```
 
 ---
 
-# 📂 Project Structure
+# 📥 Sample Request
 
-```text
-ValidationBusiness_Agent/
-
-├── src/
-│   ├── main.py
-│   ├── business_agent.py
-│   ├── validation_engine.py
-│   └── utils.py
-│
-├── tests/
-├── docs/
-├── README.md
-├── requirements.txt
-├── pytest.ini
-└── .gitignore
+```json
+{
+  "invoice_id": "INV-1001",
+  "customer_name": "ABC Pvt Ltd",
+  "amount": 2500,
+  "currency": "USD"
+}
 ```
+
+---
+
+# 📤 Sample Response
+
+```json
+{
+  "validation_status": "SUCCESS",
+  "is_valid": true,
+  "errors": [],
+  "warnings": []
+}
+```
+
+---
+
+# 📊 Architecture Diagram
+
+![Validation Business Agent](out/diagram/diagram.png)
+
+---
+
+# 🧪 Testing
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Coverage:
+
+```bash
+coverage run -m pytest
+coverage report
+```
+
+---
+
+# 🔮 Future Enhancements
+
+- AI-assisted validation
+- Batch processing
+- Authentication & Authorization
+- Dashboard & Analytics
+- Cloud Deployment
+- CI/CD Integration
+
+---
+
+# 👨‍💻 Author
+
+**Kishore**
+
+BCA Student | AI & Machine Learning Enthusiast | Python & FastAPI Developer
+
+---
+
+⭐ If you like this project, don't forget to star the repository.
