@@ -193,3 +193,117 @@ CI integration: include these commands in your pipeline to fail on regressions.
 
 For changes, follow the guidelines in `CONTRIBUTING.md`.
 
+# 🚀 Validation Business Agent
+
+![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green?logo=fastapi)
+![Pytest](https://img.shields.io/badge/Tests-165%20Passed-success)
+![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+Enterprise-ready invoice validation microservice built using **Python**, **FastAPI**, and a modular **Business Validation Engine**.
+
+---
+
+# 📖 Project Overview
+
+Validation Business Agent is a production-ready invoice validation service designed to validate structured business documents before downstream processing.
+
+The system validates invoice payloads using schema validation and business-rule validation, then returns structured JSON responses that can be consumed by enterprise applications, ERP systems, and automated financial workflows.
+
+---
+
+# ✨ Key Features
+
+- ✅ Invoice Payload Validation
+- ✅ Schema Validation
+- ✅ Business Rule Validation
+- ✅ Modular Validation Engine
+- ✅ REST API using FastAPI
+- ✅ Standardized JSON Responses
+- ✅ Error & Warning Classification
+- ✅ Enterprise Ready Architecture
+- ✅ Swagger API Documentation
+- ✅ High Test Coverage
+
+---
+
+# 🛠️ Tech Stack
+
+| Technology | Purpose |
+|------------|----------|
+| Python 3.11 | Backend Development |
+| FastAPI | REST API Framework |
+| Uvicorn | ASGI Server |
+| Pytest | Testing |
+| JSON | Data Exchange |
+| Mermaid | Architecture Documentation |
+
+---
+
+# 🏗️ System Architecture
+
+```mermaid
+flowchart LR
+
+A["👤 Client"]
+B["🚀 FastAPI API"]
+C["📦 Validation Agent"]
+D["🧠 Validation Engine"]
+E["📋 Business Rule Validator"]
+F["📊 Response Formatter"]
+G["📄 JSON Response"]
+
+A -->|POST /validate-payload| B
+B --> C
+C --> D
+D --> E
+E --> F
+F --> G
+G --> A
+```
+
+---
+
+# 🔄 Validation Workflow
+
+```mermaid
+sequenceDiagram
+
+actor Client
+
+participant API as FastAPI API
+participant Agent as Validation Agent
+participant Engine as Validation Engine
+participant Rules as Business Rule Validator
+participant Response
+
+Client->>API: POST /validate-payload
+API->>Agent: Receive JSON Payload
+Agent->>Engine: Validate Schema
+Engine->>Rules: Apply Business Rules
+Rules-->>Engine: Validation Result
+Engine-->>Response: Generate JSON Response
+Response-->>Client: Return Validation Result
+```
+
+---
+
+# 📂 Project Structure
+
+```text
+ValidationBusiness_Agent/
+
+├── src/
+│   ├── main.py
+│   ├── business_agent.py
+│   ├── validation_engine.py
+│   └── utils.py
+│
+├── tests/
+├── docs/
+├── README.md
+├── requirements.txt
+├── pytest.ini
+└── .gitignore
+```
